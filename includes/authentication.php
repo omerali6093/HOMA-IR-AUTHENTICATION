@@ -4,13 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Doctor Registration
-|--------------------------------------------------------------------------
-*/
-
+// function for doctor registration
 function homa_register_doctor() {
 
     if (
@@ -20,11 +14,7 @@ function homa_register_doctor() {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Security Check
-    |--------------------------------------------------------------------------
-    */
+    // Security Check
 
     if (
         !isset($_POST['homa_signup_nonce']) ||
@@ -37,12 +27,7 @@ function homa_register_doctor() {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Get Form Data
-    |--------------------------------------------------------------------------
-    */
-
+    // form data
     $doctor_name = sanitize_text_field(
         $_POST['doctor_name'] ?? ''
     );
@@ -56,12 +41,7 @@ function homa_register_doctor() {
     $confirm_password = $_POST['confirm_password'] ?? '';
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Validation
-    |--------------------------------------------------------------------------
-    */
-
+    // conditions wheter is correct or not
     if (empty($doctor_name)) {
 
         wp_die('Please enter your full name.');
@@ -86,12 +66,6 @@ function homa_register_doctor() {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Check Existing Email
-    |--------------------------------------------------------------------------
-    */
-
     if (email_exists($email)) {
 
         wp_die(
@@ -99,13 +73,9 @@ function homa_register_doctor() {
         );
     }
 
+     
 
-    /*
-    |--------------------------------------------------------------------------
-    | Create WordPress User
-    |--------------------------------------------------------------------------
-    */
-
+    // create users in database
     $user_id = wp_create_user(
         $email,
         $password,
@@ -121,12 +91,7 @@ function homa_register_doctor() {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Save Doctor Name
-    |--------------------------------------------------------------------------
-    */
-
+    // stores doctor name
     update_user_meta(
         $user_id,
         'doctor_name',
@@ -134,22 +99,11 @@ function homa_register_doctor() {
     );
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Login Doctor Automatically
-    |--------------------------------------------------------------------------
-    */
-
+    // login doctor by itself
     wp_set_auth_cookie($user_id);
 
     wp_set_current_user($user_id);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Redirect After Registration
-    |--------------------------------------------------------------------------
-    */
 
     wp_safe_redirect(
         home_url('/add-patient/')
@@ -164,12 +118,7 @@ add_action(
 );
 
 
-/*
-|--------------------------------------------------------------------------
-| Doctor Login
-|--------------------------------------------------------------------------
-*/
-
+  // doctor login function
 function homa_login_doctor() {
 
     if (
@@ -179,12 +128,8 @@ function homa_login_doctor() {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Security Check
-    |--------------------------------------------------------------------------
-    */
-
+    
+    // SECURITY CHECK
     if (
         !isset($_POST['homa_login_nonce']) ||
         !wp_verify_nonce(
@@ -196,12 +141,7 @@ function homa_login_doctor() {
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Get Login Data
-    |--------------------------------------------------------------------------
-    */
-
+    // get login data details
     $email = sanitize_email(
         $_POST['email'] ?? ''
     );
@@ -209,25 +149,12 @@ function homa_login_doctor() {
     $password = $_POST['password'] ?? '';
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Validation
-    |--------------------------------------------------------------------------
-    */
-
     if (empty($email) || empty($password)) {
 
         wp_die(
             'Please enter your email and password.'
         );
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Login
-    |--------------------------------------------------------------------------
-    */
 
     $user = wp_signon(
         array(
@@ -239,12 +166,7 @@ function homa_login_doctor() {
     );
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Check Login Error
-    |--------------------------------------------------------------------------
-    */
-
+    // check for error while login
     if (is_wp_error($user)) {
 
         wp_die(
@@ -252,12 +174,6 @@ function homa_login_doctor() {
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Redirect After Login
-    |--------------------------------------------------------------------------
-    */
 
     wp_safe_redirect(
         home_url('/add-patient/')
@@ -272,11 +188,8 @@ add_action(
 );
 
 
-/*
-|--------------------------------------------------------------------------
-| Doctor Logout
-|--------------------------------------------------------------------------
-*/
+
+  // doctor logout function
 
 function homa_logout_doctor() {
 
@@ -297,4 +210,4 @@ function homa_logout_doctor() {
 add_action(
     'init',
     'homa_logout_doctor'
-);
+)
