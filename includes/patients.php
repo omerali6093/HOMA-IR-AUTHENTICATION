@@ -25,6 +25,7 @@ function homa_create_patient_table() {
         name VARCHAR(150) NOT NULL,
         age INT UNSIGNED NOT NULL,
         contact VARCHAR(30) NOT NULL,
+        city VARCHAR(100) NOT NULL,
         created_at DATETIME NOT NULL,
         PRIMARY KEY (id),
         KEY doctor_id (doctor_id)
@@ -34,7 +35,6 @@ function homa_create_patient_table() {
 
     dbDelta($sql);
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +71,7 @@ function homa_add_patient() {
     $name = sanitize_text_field($_POST['patient_name'] ?? '');
     $age = absint($_POST['patient_age'] ?? 0);
     $contact = sanitize_text_field($_POST['patient_contact'] ?? '');
+    $city = sanitize_text_field($_POST['patient_city'] ?? '');
 
     /*
     |--------------------------------------------------------------------------
@@ -90,6 +91,10 @@ function homa_add_patient() {
         return;
     }
 
+    if (empty($city)) {
+    return;
+}
+
 
     /*
     |--------------------------------------------------------------------------
@@ -98,22 +103,24 @@ function homa_add_patient() {
     */
 
     $wpdb->insert(
-        $table_name,
-        array(
-            'doctor_id'  => $doctor_id,
-            'name'       => $name,
-            'age'        => $age,
-            'contact'    => $contact,
-            'created_at' => current_time('mysql')
-        ),
-        array(
-            '%d',
-            '%s',
-            '%d',
-            '%s',
-            '%s'
-        )
-    );
+    $table_name,
+    array(
+        'doctor_id'  => $doctor_id,
+        'name'       => $name,
+        'age'        => $age,
+        'contact'    => $contact,
+        'city'       => $city,
+        'created_at' => current_time('mysql')
+    ),
+    array(
+        '%d',
+        '%s',
+        '%d',
+        '%s',
+        '%s',
+        '%s'
+    )
+);
 
 
     /*

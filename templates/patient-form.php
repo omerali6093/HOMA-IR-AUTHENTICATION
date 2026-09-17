@@ -85,6 +85,22 @@ $current_user = wp_get_current_user();
 
             </div>
 
+            <div class="homa-form-group">
+
+    <label for="patient_city">
+        City
+    </label>
+
+    <input
+        type="text"
+        id="patient_city"
+        name="patient_city"
+        placeholder="Enter patient's city"
+        required
+    >
+
+</div>
+
 
             <button
                 type="submit"

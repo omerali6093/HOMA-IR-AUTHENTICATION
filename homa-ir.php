@@ -97,3 +97,15 @@ function homa_patient_form_shortcode() {
 }
 
 add_shortcode('homa_patient_form', 'homa_patient_form_shortcode');
+
+
+
+function homa_activate_plugin() {
+
+    homa_create_patient_table();
+}
+
+register_activation_hook(
+    __FILE__,
+    'homa_activate_plugin'
+);
