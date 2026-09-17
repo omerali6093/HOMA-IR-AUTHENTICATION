@@ -4,17 +4,14 @@ session_start();
 
 require_once "../config/database.php";
 
-
-// If already logged in
+// If already logged in, go directly to calculator
 if (isset($_SESSION["doctor_id"])) {
-
-    header("Location: ../dashboard/index.php");
+    header("Location: ../calculator/index.php");
     exit;
 }
 
-
 $error = "";
-
+$success = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -23,45 +20,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST["password"] ?? "";
     $confirm_password = $_POST["confirm_password"] ?? "";
 
-
     // Validation
+    if ($name === "" || $email === "" || $password === "" || $confirm_password === "") {
 
-    if (
-        empty($name) ||
-        empty($email) ||
-        empty($password) ||
-        empty($confirm_password)
-    ) {
-
-        $error = "Please fill all fields.";
+        $error = "Please fill in all fields.";
 
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
-        $error = "Please enter a valid email.";
-
-    } elseif ($password !== $confirm_password) {
-
-        $error = "Passwords do not match.";
+        $error = "Please enter a valid email address.";
 
     } elseif (strlen($password) < 6) {
 
         $error = "Password must be at least 6 characters.";
 
+    } elseif ($password !== $confirm_password) {
+
+        $error = "Passwords do not match.";
+
     } else {
 
-
         // Check if email already exists
-
         $stmt = $conn->prepare(
             "SELECT id FROM doctors WHERE email = ?"
         );
 
         $stmt->bind_param("s", $email);
-
         $stmt->execute();
 
         $result = $stmt->get_result();
-
 
         if ($result->num_rows > 0) {
 
@@ -69,21 +55,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         } else {
 
-
             // Hash password
-
             $hashed_password = password_hash(
                 $password,
                 PASSWORD_DEFAULT
             );
 
-
-            // Create doctor
-
+            // Create doctor account
             $stmt = $conn->prepare(
-                "INSERT INTO doctors
-                (name, email, password)
-                VALUES (?, ?, ?)"
+                "INSERT INTO doctors (name, email, password)
+                 VALUES (?, ?, ?)"
             );
 
             $stmt->bind_param(
@@ -93,32 +74,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $hashed_password
             );
 
-
             if ($stmt->execute()) {
 
+                // Get newly created doctor ID
                 $doctor_id = $stmt->insert_id;
 
-
-                // Create session
-
+                // Create secure session
                 session_regenerate_id(true);
 
                 $_SESSION["doctor_id"] = $doctor_id;
                 $_SESSION["doctor_name"] = $name;
                 $_SESSION["doctor_email"] = $email;
 
-
-                // Dashboard
-
-                header(
-                    "Location: ../dashboard/index.php"
-                );
-
+                // After signup → patient
+                header("Location: ../patients/add.php");
                 exit;
 
             } else {
 
-                $error = "Something went wrong.";
+                $error = "Something went wrong. Please try again.";
             }
         }
 
@@ -129,7 +103,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -141,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Doctor Signup</title>
+    <title>Doctor Signup - HOMA-IR</title>
 
     <link
         rel="stylesheet"
@@ -150,65 +123,71 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </head>
 
-
 <body>
 
 <div class="auth-container">
 
-    <div class="card">
+    <div class="auth-card">
 
-        <h1>Doctor Signup</h1>
+        <h1>Create Doctor Account</h1>
 
-        <p class="subtitle">
-            Create your doctor account
+        <p class="auth-subtitle">
+            Create your account to use the HOMA-IR Calculator
         </p>
 
+        <?php if ($error !== ""): ?>
 
-        <?php if ($error): ?>
-
-            <div class="error">
-                <?= htmlspecialchars($error) ?>
+            <div class="error-message">
+                <?php echo htmlspecialchars($error); ?>
             </div>
 
         <?php endif; ?>
-
 
         <form method="POST">
 
             <div class="form-group">
 
-                <label>Doctor Name</label>
+                <label for="name">
+                    Doctor Name
+                </label>
 
                 <input
                     type="text"
+                    id="name"
                     name="name"
-                    placeholder="Dr. Ahmed"
+                    placeholder="Enter doctor name"
+                    value="<?php echo htmlspecialchars($_POST["name"] ?? ""); ?>"
                     required
                 >
 
             </div>
 
-
             <div class="form-group">
 
-                <label>Email</label>
+                <label for="email">
+                    Email
+                </label>
 
                 <input
                     type="email"
+                    id="email"
                     name="email"
-                    placeholder="doctor@example.com"
+                    placeholder="Enter email address"
+                    value="<?php echo htmlspecialchars($_POST["email"] ?? ""); ?>"
                     required
                 >
 
             </div>
 
-
             <div class="form-group">
 
-                <label>Password</label>
+                <label for="password">
+                    Password
+                </label>
 
                 <input
                     type="password"
+                    id="password"
                     name="password"
                     placeholder="Enter password"
                     required
@@ -216,13 +195,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             </div>
 
-
             <div class="form-group">
 
-                <label>Confirm Password</label>
+                <label for="confirm_password">
+                    Confirm Password
+                </label>
 
                 <input
                     type="password"
+                    id="confirm_password"
                     name="confirm_password"
                     placeholder="Confirm password"
                     required
@@ -230,15 +211,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             </div>
 
-
-            <button type="submit">
+            <button
+                type="submit"
+                class="btn-primary"
+            >
                 Create Account
             </button>
 
         </form>
 
-
-        <p class="bottom-text">
+        <p class="auth-footer">
 
             Already have an account?
 
