@@ -54,16 +54,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 session_regenerate_id(true);
 
-                $_SESSION["doctor_id"] = $doctor["id"];
-                $_SESSION["doctor_name"] = $doctor["name"];
-                $_SESSION["doctor_email"] = $doctor["email"];
+           $_SESSION["doctor_id"] = $doctor["id"];
+           $_SESSION["doctor_name"] = $doctor["name"];
+           $_SESSION["doctor_email"] = $doctor["email"];
 
-
-                header(
-                    "Location: ../dashboard/index.php"
-                );
-
-                exit;
+           header("Location: ../patients/add.php");
+           exit;
 
             } else {
 

@@ -56,32 +56,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Insert patient
 
-        $stmt = $conn->prepare(
-            "INSERT INTO patients
-            (doctor_id, name, age, contact, city)
-            VALUES (?, ?, ?, ?, ?)"
-        );
+        $stmt = $conn->prepare("
+    INSERT INTO patients (doctor_id, name, age, contact, city)
+    VALUES (?, ?, ?, ?, ?)
+");
 
+$stmt->bind_param(
+    "isiss",
+    $doctor_id,
+    $name,
+    $age,
+    $contact,
+    $city
+);
 
-        $stmt->bind_param(
-            "isiss",
-            $doctor_id,
-            $name,
-            $age,
-            $contact,
-            $city
-        );
+if ($stmt->execute()) {
 
+    $patient_id = $stmt->insert_id;
 
-        if ($stmt->execute()) {
+    header("Location: ../calculator/index.php?patient_id=" . $patient_id);
+    exit;
+}
 
-            header("Location: list.php");
-            exit;
-
-        } else {
-
-            $error = "Failed to add patient.";
-        }
+$error = "Failed to add patient.";
 
 
         $stmt->close();
