@@ -198,7 +198,7 @@ function homa_logout_doctor() {
     ) {
 
         wp_logout();
-
+ 
         wp_safe_redirect(
             home_url('/login/')
         );
