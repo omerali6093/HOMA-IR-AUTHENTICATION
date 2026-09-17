@@ -70,3 +70,76 @@
     color: #1689e8;
     font-weight: 600;
 }
+
+.homa-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background: #f5f7fb;
+}
+
+.homa-card {
+    width: 100%;
+    max-width: 500px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.homa-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.homa-header h1 {
+    margin: 0 0 10px;
+    font-size: 32px;
+}
+
+.homa-header p {
+    margin: 0;
+    color: #666;
+}
+
+.homa-form-group {
+    margin-bottom: 20px;
+}
+
+.homa-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.homa-form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    border: 1px solid #d9dce3;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.homa-form-group input:focus {
+    outline: none;
+    border-color: #242864;
+}
+
+.homa-button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #242864;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.homa-button:hover {
+    opacity: 0.9;
+}

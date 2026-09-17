@@ -27,6 +27,7 @@ define(
 
 // load authentication files
 require_once HOMA_PLUGIN_PATH . 'includes/authentication.php';
+require_once HOMA_PLUGIN_PATH . 'includes/patients.php';
 
 
 // load css file
@@ -63,6 +64,8 @@ add_shortcode(
 
 
 
+
+
 // // this function is generating the login code
 function homa_login_shortcode() {
 
@@ -77,3 +80,20 @@ add_shortcode(
     'homa_login',
     'homa_login_shortcode'
 );
+
+// this is function is generation is patient shortcode
+function homa_patient_form_shortcode() {
+
+    if (!is_user_logged_in()) {
+
+        return '<p>Please login as a doctor first.</p>';
+    }
+
+    ob_start();
+
+    include HOMA_PLUGIN_PATH . 'templates/patient-form.php';
+
+    return ob_get_clean();
+}
+
+add_shortcode('homa_patient_form', 'homa_patient_form_shortcode');
