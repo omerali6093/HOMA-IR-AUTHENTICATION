@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * Plugin Name: HOMA-IR Calculator
+ * Description: HOMA-IR Calculator for doctors.
+ * Version: 1.0.0
+ * Author: Your Name
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
+//Plugin Constants
+define(
+    'HOMA_PLUGIN_PATH',
+    plugin_dir_path(__FILE__)
+);
+
+define(
+    'HOMA_PLUGIN_URL',
+    plugin_dir_url(__FILE__)
+);
+
+
+
+// load authentication files
+require_once HOMA_PLUGIN_PATH . 'includes/authentication.php';
+
+
+// load css file
+function homa_enqueue_styles() {
+
+    wp_enqueue_style(
+        'homa-style',
+        HOMA_PLUGIN_URL . 'assets/style.css',
+        array(),
+        '1.0.0'
+    );
+}
+
+add_action(
+    'wp_enqueue_scripts',
+    'homa_enqueue_styles'
+);
+
+
+// this function is generating the signup code
+function homa_signup_shortcode() {
+
+    ob_start();
+
+    include HOMA_PLUGIN_PATH . 'templates/signup.php';
+
+    return ob_get_clean();
+}
+
+add_shortcode(
+    'homa_signup',
+    'homa_signup_shortcode'
+);
+
+
+
+// // this function is generating the login code
+function homa_login_shortcode() {
+
+    ob_start();
+
+    include HOMA_PLUGIN_PATH . 'templates/login.php';
+
+    return ob_get_clean();
+}
+
+add_shortcode(
+    'homa_login',
+    'homa_login_shortcode'
+);
