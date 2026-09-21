@@ -1,3 +1,39 @@
+:root {
+  /* Palette */
+  --bg: #eaf1ff;
+  --surface: #ffffff;
+  --surface-soft: #f4f8ff;
+  --ink: #0b1f44;
+  --muted: #5a6b8c;
+  --line: #d6e2f7;
+  --line-strong: #b4c8ee;
+  --blue: #2563eb;
+  --blue-strong: #1d4ed8;
+  --blue-hover: #1e40af;
+  --blue-deep: #0b2a66;
+  --blue-tint: #e3edff;
+  --danger: #b42318;
+  --danger-bg: #fef1f0;
+  --danger-line: #f6c7c2;
+ 
+  /* Shape */
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+ 
+  /* Type */
+  --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+ 
+  /* Keep content clear of phone system bars (0 on desktop) */
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+
+
+
 * {
     box-sizing: border-box;
 }
@@ -375,6 +411,638 @@ th {
     padding: 50px 20px;
 
     color: #777;
+}
+
+
+/* Calculator Styling */
+.calc-page {
+  width: 100%;
+  max-width: 580px;
+  margin: auto; /* centres in both directions, and never clips when tall */
+  padding: 32px 20px 40px;
+}
+ 
+.calc-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px 16px;
+}
+ 
+.calc-welcome {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+ 
+.calc-welcome strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+ 
+.calc-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue-strong);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+ 
+.calc-logout:hover {
+  background: var(--blue-tint);
+  border-color: var(--line-strong);
+}
+ 
+.calc-logout svg {
+  width: 16px;
+  height: 16px;
+}
+ 
+/* --------------------------------------------------------------------------
+   Main card
+   -------------------------------------------------------------------------- */
+ 
+.calc-card {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(15, 59, 168, 0.06),
+    0 28px 56px -20px rgba(29, 78, 216, 0.28);
+}
+ 
+/* Header band */
+ 
+.calc-header {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 28px 30px;
+  color: #fff;
+  background: linear-gradient(135deg, #1e4fd9 0%, #2b67ee 100%);
+}
+ 
+/* Two thin rings: a quiet nod to a dial */
+.calc-header::before,
+.calc-header::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+ 
+.calc-header::before {
+  width: 240px;
+  height: 240px;
+  top: -110px;
+  right: -70px;
+}
+ 
+.calc-header::after {
+  width: 150px;
+  height: 150px;
+  top: -62px;
+  right: -26px;
+}
+ 
+.calc-header-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 13px;
+}
+ 
+.calc-header-icon svg {
+  width: 24px;
+  height: 24px;
+}
+ 
+.calc-header h1 {
+  position: relative;
+  margin: 0 0 6px;
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+ 
+.calc-header p {
+  position: relative;
+  max-width: 38ch;
+  margin: 0;
+  font-size: 15px;
+  color: #dce7ff;
+}
+ 
+/* --------------------------------------------------------------------------
+   Alerts
+   -------------------------------------------------------------------------- */
+ 
+.calc-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 28px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius-md);
+}
+ 
+.calc-alert svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+ 
+/* --------------------------------------------------------------------------
+   Patient strip
+   -------------------------------------------------------------------------- */
+ 
+.calc-patient {
+  padding: 22px 28px;
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--line);
+}
+ 
+.calc-alert ~ .calc-patient,
+.calc-alert ~ * .calc-patient {
+  border-top: 1px solid var(--line);
+}
+ 
+.calc-patient-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+ 
+.calc-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--blue-strong);
+  background: var(--blue-tint);
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+}
+ 
+.calc-patient-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+ 
+.calc-patient-sub {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+ 
+.calc-patient-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+ 
+.calc-patient-details > div {
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+ 
+.calc-patient-details dt {
+  margin: 0 0 1px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+ 
+.calc-patient-details dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+ 
+/* --------------------------------------------------------------------------
+   Form
+   -------------------------------------------------------------------------- */
+ 
+.calc-form {
+  padding: 26px 28px 28px;
+}
+ 
+.calc-form-title {
+  margin: 0 0 4px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+ 
+.calc-form-lead {
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+ 
+.calc-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 16px;
+  margin-bottom: 24px;
+}
+ 
+.calc-field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+ 
+.calc-field-wide {
+  grid-column: 1 / -1;
+}
+ 
+.calc-label,
+.calc-field legend {
+  display: block;
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+ 
+.calc-hint {
+  display: block;
+  margin-top: 7px;
+  font-size: 13px;
+  color: var(--muted);
+}
+ 
+/* Segmented unit switch (radio inputs stay in the DOM for keyboards + POST) */
+ 
+.calc-segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--blue-tint);
+  border-radius: var(--radius-md);
+}
+ 
+.calc-segmented input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+ 
+.calc-segmented label {
+  display: block;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--muted);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+ 
+.calc-segmented label:hover {
+  color: var(--blue-strong);
+}
+ 
+.calc-segmented input:checked + label {
+  color: var(--blue-strong);
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(15, 59, 168, 0.12),
+    0 4px 10px -4px rgba(29, 78, 216, 0.25);
+}
+ 
+.calc-segmented input:focus-visible + label {
+  outline: 3px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+ 
+/* Number inputs with a unit tag on the right */
+ 
+.calc-input-wrap {
+  position: relative;
+}
+ 
+.calc-input {
+  width: 100%;
+  height: 54px;
+  padding: 0 78px 0 16px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line-strong);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+ 
+.calc-input::-webkit-outer-spin-button,
+.calc-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+ 
+.calc-input::placeholder {
+  font-weight: 500;
+  color: #93a3c2;
+}
+ 
+.calc-input:hover {
+  border-color: #8fb0ea;
+}
+ 
+.calc-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+}
+ 
+.calc-suffix {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  padding: 5px 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-strong);
+  background: var(--blue-tint);
+  border-radius: 8px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+ 
+/* Buttons (works on <button> and <a>) */
+ 
+.calc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 54px;
+  padding: 0 24px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: var(--blue-strong);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px -8px rgba(29, 78, 216, 0.6);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+ 
+.calc-btn:hover {
+  background: var(--blue-hover);
+}
+ 
+.calc-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px -6px rgba(29, 78, 216, 0.6);
+}
+ 
+.calc-btn:focus-visible,
+.calc-logout:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+ 
+.calc-btn svg {
+  width: 20px;
+  height: 20px;
+}
+ 
+.calc-btn-inline {
+  width: auto;
+}
+ 
+/* --------------------------------------------------------------------------
+   Result panel (the one bold moment)
+   -------------------------------------------------------------------------- */
+ 
+.calc-result {
+  position: relative;
+  overflow: hidden;
+  margin: 0 28px 28px;
+  padding: 24px 24px 22px;
+  color: #fff;
+  background: var(--blue-deep);
+  border-radius: 18px;
+  animation: calc-result-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+ 
+.calc-result::before,
+.calc-result::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+ 
+.calc-result::before {
+  width: 260px;
+  height: 260px;
+  right: -90px;
+  bottom: -130px;
+}
+ 
+.calc-result::after {
+  width: 160px;
+  height: 160px;
+  right: -40px;
+  bottom: -80px;
+}
+ 
+.calc-result-label {
+  position: relative;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a9c3ff;
+}
+ 
+.calc-result-value {
+  position: relative;
+  margin: 2px 0 12px;
+  font-size: 68px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+ 
+.calc-result-inputs {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+ 
+.calc-result-inputs li {
+  padding: 5px 11px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #dbe6ff;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+ 
+.calc-result-note {
+  position: relative;
+  max-width: 52ch;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #c6d6f7;
+}
+ 
+@keyframes calc-result-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+ 
+/* --------------------------------------------------------------------------
+   Empty state (no patient selected)
+   -------------------------------------------------------------------------- */
+ 
+.calc-empty {
+  padding: 40px 28px 36px;
+  text-align: center;
+}
+ 
+.calc-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  color: var(--blue-strong);
+  background: var(--blue-tint);
+  border-radius: 50%;
+}
+ 
+.calc-empty-icon svg {
+  width: 28px;
+  height: 28px;
+}
+ 
+.calc-empty h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+ 
+.calc-empty p {
+  max-width: 34ch;
+  margin: 0 auto 22px;
+  font-size: 15px;
+  color: var(--muted);
+}
+ 
+/* --------------------------------------------------------------------------
+   Small screens
+   -------------------------------------------------------------------------- */
+ 
+@media (max-width: 540px) {
+  .calc-page {
+    padding: 20px 14px 32px;
+  }
+ 
+  .calc-header,
+  .calc-patient,
+  .calc-form,
+  .calc-empty {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+ 
+  .calc-alert {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+ 
+  .calc-header h1 {
+    font-size: 24px;
+  }
+ 
+  .calc-fields {
+    grid-template-columns: 1fr;
+  }
+ 
+  .calc-result {
+    margin: 0 20px 20px;
+    padding: 22px 20px 20px;
+  }
+ 
+  .calc-result-value {
+    font-size: 58px;
+  }
+}
+ 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 
