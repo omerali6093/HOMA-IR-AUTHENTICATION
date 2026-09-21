@@ -789,6 +789,231 @@ body {
 
 
 /* ==================================================
+   RESULT SUCCESS
+================================================== */
+
+.result-success {
+    margin-top: 18px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 8px 13px;
+
+    border-radius: 20px;
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.success-check {
+    width: 18px;
+    height: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+
+    color: white;
+
+    font-size: 11px;
+}
+
+
+/* ==================================================
+   INTERPRETATION CARD
+================================================== */
+
+.interpretation-card {
+    margin-top: 20px;
+
+    background: linear-gradient(
+        145deg,
+        #eff6ff,
+        #ffffff
+    );
+
+    border: 1px solid #dbeafe;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 8px 30px rgba(37, 99, 235, 0.06);
+}
+
+
+/* Header */
+
+.interpretation-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+.interpretation-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #dbeafe;
+
+    color: #2563eb;
+
+    font-size: 17px;
+
+    font-weight: 800;
+}
+
+
+.interpretation-header h3 {
+    margin: 0;
+
+    font-size: 19px;
+
+    color: #172033;
+}
+
+
+.interpretation-header p {
+    margin: 4px 0 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+/* Table */
+
+.interpretation-table {
+    overflow: hidden;
+
+    border: 1px solid #dbe3ee;
+
+    border-radius: 10px;
+
+    background: white;
+}
+
+
+.interpretation-row {
+    display: grid;
+
+    grid-template-columns: 125px 1fr;
+
+    min-height: 48px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+.interpretation-row:last-child {
+    border-bottom: none;
+}
+
+
+.interpretation-range {
+    display: flex;
+
+    align-items: center;
+
+    padding: 10px 15px;
+
+    background: #f8fafc;
+
+    border-right: 1px solid #e5e7eb;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    color: #334155;
+}
+
+
+.interpretation-text {
+    display: flex;
+
+    align-items: center;
+
+    padding: 10px 15px;
+
+    font-size: 14px;
+
+    color: #64748b;
+}
+
+
+/* Disclaimer */
+
+.interpretation-note {
+    margin-top: 15px;
+
+    padding: 12px 14px;
+
+    border-radius: 9px;
+
+    background: rgba(255, 255, 255, 0.8);
+
+    border: 1px solid #e2e8f0;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+
+/* Mobile */
+
+@media (max-width: 500px) {
+
+    .interpretation-card {
+        padding: 18px;
+    }
+
+    .interpretation-row {
+        grid-template-columns: 95px 1fr;
+    }
+
+    .interpretation-range,
+    .interpretation-text {
+        font-size: 12px;
+        padding: 9px 10px;
+    }
+
+}
+
+
+
+/* ==================================================
    FOOTER
 ================================================== */
 
@@ -1215,59 +1440,123 @@ body {
 
             <?php if ($result !== null): ?>
 
-                <section class="result-card">
+    <section class="result-card">
 
-                    <div class="result-icon">
-                        ✓
-                    </div>
+        <div class="result-icon">
+            ✓
+        </div>
 
-                    <h3>
-                        Calculation Result
-                    </h3>
+        <h3>
+            Your HOMA-IR Result
+        </h3>
 
-                    <div class="result-label">
-                        HOMA-IR Score
-                    </div>
+        <div class="result-number">
+            <?php echo htmlspecialchars($result); ?>
+        </div>
 
-                    <div class="result-number">
-                        <?php
-                        echo htmlspecialchars(
-                            $result
-                        );
-                        ?>
-                    </div>
+        <div class="result-unit">
+            HOMA-IR
+        </div>
 
-                    <div class="result-unit">
-                        HOMA-IR
-                    </div>
 
-                    <div class="result-note">
-                        Calculation saved successfully
-                        to the database.
-                    </div>
+        <!--- -------------- -->
+        <div class="interpretation-header">
 
-                </section>
+            <div class="interpretation-icon">
+                ▂▅▇
+            </div>
 
-            <?php else: ?>
+            <div>
 
-                <section class="result-card empty-result">
+                <h3>
+                    What does this mean?
+                </h3>
 
-                    <div class="result-icon">
-                        +
-                    </div>
+                
 
-                    <h3>
-                        Your Result
-                    </h3>
+            </div>
 
-                    <p>
-                        Enter the patient's laboratory
-                        values and click
-                        <strong>Calculate HOMA-IR</strong>
-                        to see the result here.
-                    </p>
+        </div>
 
-                </section>
+
+        <div class="interpretation-table">
+
+            <div class="interpretation-row">
+
+                <div class="interpretation-range">
+                    &lt; 1.0
+                </div>
+
+                <div class="interpretation-text">
+                    Insulin-sensitive range
+                </div>
+
+            </div>
+
+
+            <div class="interpretation-row">
+
+                <div class="interpretation-range">
+                    1.0 – 1.9
+                </div>
+
+                <div class="interpretation-text">
+                    May indicate early insulin resistance
+                </div>
+
+            </div>
+
+
+            <div class="interpretation-row">
+
+                <div class="interpretation-range">
+                    2.0 – 2.8
+                </div>
+
+                <div class="interpretation-text">
+                    Intermediate range
+                </div>
+
+            </div>
+
+
+            <div class="interpretation-row">
+
+                <div class="interpretation-range">
+                    ≥ 2.9
+                </div>
+
+                <div class="interpretation-text">
+                    May indicate significant insulin resistance
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="interpretation-note">
+
+            These ranges are provided for reference only.
+            HOMA-IR should be interpreted together with
+            other clinical information by a qualified healthcare professional.
+
+        </div>
+        <!--- -------------- -->
+
+
+        <div class="result-success">
+
+            <span class="success-check">✓</span>
+
+            Result calculated successfully
+        </div>
+
+    </section>
+
+   
+
+        
 
             <?php endif; ?>
 
