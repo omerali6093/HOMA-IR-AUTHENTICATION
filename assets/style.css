@@ -32,7 +32,22 @@
   color-scheme: light;
 }
 
-
+/* Calculator page: centred layout, font and background (scoped to this page) */
+body.calc-body {
+  min-height: 100vh;
+  display: flex;
+  font-family: var(--font);
+  line-height: 1.5;
+  color: var(--ink);
+  background-color: var(--bg);
+  background-image: radial-gradient(
+    900px 420px at 50% -8%,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  background-repeat: no-repeat;
+  -webkit-font-smoothing: antialiased;
+}
 
 * {
     box-sizing: border-box;
