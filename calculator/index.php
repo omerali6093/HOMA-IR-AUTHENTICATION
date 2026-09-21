@@ -1121,7 +1121,6 @@ body {
 
         <span class="doctor-name">
 
-            Dr.
             <?php
             echo htmlspecialchars(
                 $_SESSION["doctor_name"]
@@ -1566,15 +1565,6 @@ body {
 
     <?php endif; ?>
 
-
-    <div class="calculator-footer">
-
-        HOMA-IR Calculator
-        &nbsp;•&nbsp;
-        Patient data is securely linked to the
-        logged-in doctor.
-
-    </div>
 
 
 </main>
