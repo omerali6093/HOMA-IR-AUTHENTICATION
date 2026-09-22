@@ -3,6 +3,7 @@
 session_start();
 
 require_once "../config/database.php";
+require_once "../includes/ui.php";
 
 // If already logged in, go directly to calculator
 if (isset($_SESSION["doctor_id"])) {
@@ -12,6 +13,14 @@ if (isset($_SESSION["doctor_id"])) {
 
 $error = "";
 $success = "";
+
+// Message left by the Google sign-up flow (google-login.php / google-callback.php)
+if (isset($_SESSION["signup_error"])) {
+
+    $error = $_SESSION["signup_error"];
+
+    unset($_SESSION["signup_error"]);
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -36,6 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif ($password !== $confirm_password) {
 
         $error = "Passwords do not match.";
+
+    } elseif (!isset($_POST["terms"])) {
+
+        $error = "Please agree to the Terms & Conditions and Privacy Policy to continue.";
 
     } else {
 
@@ -118,121 +131,300 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <link
         rel="stylesheet"
-        href="../assets/style.css"
+        href="../assets/homa-ui.css"
     >
 
 </head>
 
-<body>
+<body class="hu-body">
 
-<div class="auth-container">
+<div class="hu-page">
 
-    <div class="auth-card">
+    <?php hu_page_header(1); ?>
 
-        <h1>Create Doctor Account</h1>
+    <main class="hu-main">
 
-        <p class="auth-subtitle">
-            Create your account to use the HOMA-IR Calculator
-        </p>
+        <section class="hu-card">
 
-        <?php if ($error !== ""): ?>
+            <div class="hu-card__head">
 
-            <div class="error-message">
-                <?php echo htmlspecialchars($error); ?>
-            </div>
+                <div class="hu-card__badge">
+                    <?php echo hu_icon("user-solid"); ?>
+                </div>
 
-        <?php endif; ?>
+                <div>
 
-        <form method="POST">
+                    <h2 class="hu-card__title">
+                        Create Your Account
+                    </h2>
 
-            <div class="form-group">
+                    <p class="hu-card__sub">
+                        Register to Access the HOMA-IR Calculator
+                        and save your results.
+                    </p>
 
-                <label for="name">
-                    Doctor Name
-                </label>
-
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    placeholder="Enter doctor name"
-                    value="<?php echo htmlspecialchars($_POST["name"] ?? ""); ?>"
-                    required
-                >
+                </div>
 
             </div>
 
-            <div class="form-group">
 
-                <label for="email">
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter email address"
-                    value="<?php echo htmlspecialchars($_POST["email"] ?? ""); ?>"
-                    required
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="password">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter password"
-                    required
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="confirm_password">
-                    Confirm Password
-                </label>
-
-                <input
-                    type="password"
-                    id="confirm_password"
-                    name="confirm_password"
-                    placeholder="Confirm password"
-                    required
-                >
-
-            </div>
-
-            <button
-                type="submit"
-                class="btn-primary"
+            <div
+                class="hu-alert"
+                id="form-alert"
+                role="alert"
+                <?php echo $error === "" ? "hidden" : ""; ?>
             >
-                Create Account
-            </button>
+                <?php echo hu_icon("alert"); ?>
 
-        </form>
+                <span id="form-alert-text"><?php echo htmlspecialchars($error); ?></span>
+            </div>
 
-        <p class="auth-footer">
 
-            Already have an account?
+            <form method="POST" id="signup-form">
 
-            <a href="login.php">
-                Login
-            </a>
+                <div class="hu-field">
 
-        </p>
+                    <label class="hu-label" for="name">
+                        Full Name <span class="hu-req" aria-hidden="true">*</span>
+                    </label>
 
-    </div>
+                    <div class="hu-input">
+
+                        <?php echo hu_icon("user", "hu-input__icon"); ?>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Enter your full name"
+                            autocomplete="name"
+                            value="<?php echo htmlspecialchars($_POST["name"] ?? ""); ?>"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="hu-field">
+
+                    <label class="hu-label" for="email">
+                        Email Address <span class="hu-req" aria-hidden="true">*</span>
+                    </label>
+
+                    <div class="hu-input">
+
+                        <?php echo hu_icon("mail", "hu-input__icon"); ?>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Enter your email address"
+                            autocomplete="email"
+                            value="<?php echo htmlspecialchars($_POST["email"] ?? ""); ?>"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="hu-field">
+
+                    <label class="hu-label" for="password">
+                        Password <span class="hu-req" aria-hidden="true">*</span>
+                    </label>
+
+                    <div class="hu-input">
+
+                        <?php echo hu_icon("lock", "hu-input__icon"); ?>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="hu-input__toggle"
+                            data-toggle="password"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            <?php echo hu_icon("eye", "icon-on"); ?>
+                            <?php echo hu_icon("eye-off", "icon-off"); ?>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hu-field">
+
+                    <label class="hu-label" for="confirm_password">
+                        Confirm Password <span class="hu-req" aria-hidden="true">*</span>
+                    </label>
+
+                    <div class="hu-input">
+
+                        <?php echo hu_icon("lock", "hu-input__icon"); ?>
+
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="hu-input__toggle"
+                            data-toggle="confirm_password"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            <?php echo hu_icon("eye", "icon-on"); ?>
+                            <?php echo hu_icon("eye-off", "icon-off"); ?>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Terms & Conditions -->
+
+                <label class="hu-check" id="terms-label">
+
+                    <input
+                        type="checkbox"
+                        id="terms"
+                        name="terms"
+                        value="1"
+                        <?php echo isset($_POST["terms"]) ? "checked" : ""; ?>
+                        required
+                    >
+
+                    <span class="hu-check__box">
+                        <?php echo hu_icon("check"); ?>
+                    </span>
+
+                    <span>
+                        I agree to the
+                        <a href="terms.php" target="_blank" rel="noopener">Terms &amp; Conditions</a>
+                        and
+                        <a href="privacy.php" target="_blank" rel="noopener">Privacy Policy</a>
+                    </span>
+
+                </label>
+
+
+                <button
+                    type="submit"
+                    class="hu-btn hu-btn--primary"
+                >
+                    Create Account
+                    <?php echo hu_icon("arrow-right"); ?>
+                </button>
+
+
+                <div class="hu-or">OR</div>
+
+
+                <!-- Sign up with Google (posts the same form so the terms box is checked on the server too) -->
+
+                <button
+                    type="submit"
+                    class="hu-btn hu-btn--google"
+                    id="google-btn"
+                    formaction="google-login.php"
+                    formnovalidate
+                >
+                    <?php echo hu_google_logo(); ?>
+                    Sign up with Google
+                </button>
+
+            </form>
+
+
+            <p class="hu-switch">
+
+                Already have an account?
+
+                <a href="login.php">
+                    Sign In
+                </a>
+
+            </p>
+
+        </section>
+
+    </main>
 
 </div>
+
+
+<script>
+(function () {
+
+    // Show / hide password
+    document.querySelectorAll("[data-toggle]").forEach(function (btn) {
+
+        btn.addEventListener("click", function () {
+
+            var input   = document.getElementById(btn.getAttribute("data-toggle"));
+            var showing = input.type === "text";
+
+            input.type = showing ? "password" : "text";
+
+            btn.setAttribute("aria-pressed", showing ? "false" : "true");
+            btn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+        });
+    });
+
+
+    // "Sign up with Google" needs the Terms box ticked first
+    var terms      = document.getElementById("terms");
+    var termsLabel = document.getElementById("terms-label");
+    var alertBox   = document.getElementById("form-alert");
+    var alertText  = document.getElementById("form-alert-text");
+
+    document.getElementById("google-btn").addEventListener("click", function (event) {
+
+        if (terms.checked) {
+            return;
+        }
+
+        event.preventDefault();
+
+        alertText.textContent =
+            "Please agree to the Terms & Conditions and Privacy Policy to continue.";
+
+        alertBox.hidden = false;
+        termsLabel.classList.add("is-invalid");
+
+        terms.focus();
+    });
+
+    terms.addEventListener("change", function () {
+
+        if (terms.checked) {
+            termsLabel.classList.remove("is-invalid");
+        }
+    });
+
+})();
+</script>
 
 </body>
 

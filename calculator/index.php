@@ -3,6 +3,7 @@
 session_start();
 
 require_once "../config/database.php";
+require_once "../includes/ui.php";
 
 // Check doctor login
 if (!isset($_SESSION["doctor_id"])) {
@@ -167,6 +168,16 @@ if (
 
 ?>
 
+<?php
+
+// Presentation only: which glucose-unit tab is selected (defaults to US units)
+$selected_unit =
+    (($_POST["glucose_unit"] ?? "") === "mmol_l")
+    ? "mmol_l"
+    : "mg_dl";
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -183,943 +194,30 @@ if (
 
     <link
         rel="stylesheet"
-        href="../assets/style.css"
+        href="../assets/homa-ui.css"
     >
-
-    <style>
-
-/* ==================================================
-   CALCULATOR PAGE
-================================================== */
-
-:root {
-    --primary-blue: #2563eb;
-    --dark-blue: #1e40af;
-    --light-blue: #eff6ff;
-    --blue-border: #bfdbfe;
-
-    --text-dark: #172033;
-    --text-gray: #64748b;
-
-    --white: #ffffff;
-    --background: #f5f9ff;
-
-    --border: #e2e8f0;
-
-    --success: #16a34a;
-    --success-light: #f0fdf4;
-
-    --danger: #dc2626;
-    --danger-light: #fef2f2;
-}
-
-
-/* Reset */
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family:
-        Inter,
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    background: var(--background);
-    color: var(--text-dark);
-}
-
-
-/* ==================================================
-   NAVBAR
-================================================== */
-
-.calculator-navbar {
-    height: 72px;
-
-    background: var(--white);
-
-    border-bottom: 1px solid var(--border);
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 0 7%;
-
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    font-size: 20px;
-    font-weight: 800;
-
-    color: var(--dark-blue);
-}
-
-
-.brand-icon {
-    width: 38px;
-    height: 38px;
-
-    background: var(--primary-blue);
-
-    color: white;
-
-    border-radius: 10px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 18px;
-}
-
-
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
-
-
-.doctor-name {
-    color: var(--text-gray);
-    font-size: 14px;
-}
-
-
-.logout-btn {
-    text-decoration: none;
-
-    color: var(--danger);
-
-    border: 1px solid #fecaca;
-
-    background: white;
-
-    padding: 9px 16px;
-
-    border-radius: 8px;
-
-    font-size: 14px;
-    font-weight: 600;
-
-    transition: 0.2s;
-}
-
-
-.logout-btn:hover {
-    background: var(--danger-light);
-}
-
-
-/* ==================================================
-   MAIN
-================================================== */
-
-.calculator-wrapper {
-    width: min(1100px, 92%);
-
-    margin: 45px auto 70px;
-}
-
-
-/* Header */
-
-.page-header {
-    margin-bottom: 30px;
-}
-
-
-.page-header h1 {
-    margin: 0 0 8px;
-
-    font-size: 32px;
-
-    color: var(--text-dark);
-}
-
-
-.page-header p {
-    margin: 0;
-
-    color: var(--text-gray);
-
-    font-size: 15px;
-}
-
-
-/* ==================================================
-   PATIENT CARD
-================================================== */
-
-.patient-card {
-    background: white;
-
-    border: 1px solid var(--blue-border);
-
-    border-radius: 16px;
-
-    padding: 24px;
-
-    margin-bottom: 24px;
-
-    box-shadow:
-        0 8px 30px rgba(37, 99, 235, 0.06);
-}
-
-
-.patient-header {
-    display: flex;
-
-    align-items: center;
-
-    gap: 14px;
-
-    margin-bottom: 20px;
-}
-
-
-.patient-avatar {
-    width: 48px;
-    height: 48px;
-
-    border-radius: 12px;
-
-    background: var(--light-blue);
-
-    color: var(--primary-blue);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 21px;
-
-    font-weight: 800;
-}
-
-
-.patient-header h2 {
-    margin: 0;
-
-    font-size: 18px;
-}
-
-
-.patient-header span {
-    display: block;
-
-    margin-top: 3px;
-
-    color: var(--text-gray);
-
-    font-size: 13px;
-}
-
-
-.patient-details {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 15px;
-}
-
-
-.patient-detail {
-    background: #f8fafc;
-
-    border: 1px solid #e8eef6;
-
-    padding: 14px 16px;
-
-    border-radius: 10px;
-}
-
-
-.patient-detail-label {
-    display: block;
-
-    color: var(--text-gray);
-
-    font-size: 12px;
-
-    margin-bottom: 5px;
-}
-
-
-.patient-detail-value {
-    font-size: 14px;
-
-    font-weight: 600;
-
-    color: var(--text-dark);
-}
-
-
-/* ==================================================
-   CALCULATOR GRID
-================================================== */
-
-.calculator-grid {
-    display: grid;
-
-    grid-template-columns:
-        1fr 0.8fr;
-
-    gap: 24px;
-
-    align-items: stretch;
-}
-
-
-/* ==================================================
-   CALCULATOR CARD
-================================================== */
-
-.calculator-card {
-    background: white;
-
-    border-radius: 16px;
-
-    border: 1px solid var(--border);
-
-    padding: 30px;
-
-    box-shadow:
-        0 10px 35px rgba(15, 23, 42, 0.05);
-}
-
-
-.calculator-card-header {
-    margin-bottom: 25px;
-}
-
-
-.calculator-card-header h2 {
-    margin: 0 0 7px;
-
-    font-size: 21px;
-}
-
-
-.calculator-card-header p {
-    margin: 0;
-
-    color: var(--text-gray);
-
-    font-size: 13px;
-}
-
-
-/* ==================================================
-   FORM
-================================================== */
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-
-.form-group label {
-    display: block;
-
-    margin-bottom: 8px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    color: var(--text-dark);
-}
-
-
-.input-wrapper {
-    position: relative;
-}
-
-
-.input-wrapper input,
-.form-select {
-    width: 100%;
-
-    height: 48px;
-
-    padding: 0 14px;
-
-    border: 1px solid #d7dee9;
-
-    border-radius: 9px;
-
-    background: white;
-
-    color: var(--text-dark);
-
-    font-size: 14px;
-
-    outline: none;
-
-    transition: 0.2s;
-}
-
-
-.input-wrapper input:focus,
-.form-select:focus {
-    border-color: var(--primary-blue);
-
-    box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.10);
-}
-
-
-.unit-help {
-    margin-top: 7px;
-
-    color: var(--text-gray);
-
-    font-size: 12px;
-}
-
-
-/* Calculate button */
-
-.calculate-btn {
-    width: 100%;
-
-    height: 50px;
-
-    border: none;
-
-    border-radius: 9px;
-
-    background: var(--primary-blue);
-
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-
-.calculate-btn:hover {
-    background: var(--dark-blue);
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 8px 20px rgba(37, 99, 235, 0.20);
-}
-
-
-/* ==================================================
-   RESULT CARD
-================================================== */
-
-.result-card {
-    background:
-        linear-gradient(
-            145deg,
-            #eff6ff,
-            #ffffff
-        );
-
-    border: 1px solid var(--blue-border);
-
-    border-radius: 16px;
-
-    padding: 30px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    align-items: center;
-
-    text-align: center;
-}
-
-
-.result-icon {
-    width: 58px;
-    height: 58px;
-
-    border-radius: 16px;
-
-    background: var(--primary-blue);
-
-    color: white;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 25px;
-
-    margin-bottom: 18px;
-}
-
-
-.result-card h3 {
-    margin: 0;
-
-    font-size: 18px;
-}
-
-
-.result-label {
-    margin-top: 6px;
-
-    color: var(--text-gray);
-
-    font-size: 13px;
-}
-
-
-.result-number {
-    margin: 18px 0 4px;
-
-    font-size: 52px;
-
-    line-height: 1;
-
-    font-weight: 800;
-
-    color: var(--primary-blue);
-}
-
-
-.result-unit {
-    color: var(--text-gray);
-
-    font-size: 13px;
-}
-
-
-.result-note {
-    margin-top: 22px;
-
-    padding: 11px 15px;
-
-    background: white;
-
-    border-radius: 8px;
-
-    border: 1px solid var(--blue-border);
-
-    color: var(--text-gray);
-
-    font-size: 12px;
-
-    line-height: 1.5;
-}
-
-
-/* ==================================================
-   EMPTY RESULT
-================================================== */
-
-.empty-result {
-    text-align: center;
-
-    color: var(--text-gray);
-}
-
-
-.empty-result .result-icon {
-    background: var(--light-blue);
-
-    color: var(--primary-blue);
-}
-
-
-.empty-result p {
-    max-width: 230px;
-
-    font-size: 13px;
-
-    line-height: 1.6;
-
-    margin: 10px auto 0;
-}
-
-
-/* ==================================================
-   ERROR
-================================================== */
-
-.calculator-error {
-    background: var(--danger-light);
-
-    border: 1px solid #fecaca;
-
-    color: var(--danger);
-
-    padding: 13px 16px;
-
-    border-radius: 9px;
-
-    margin-bottom: 20px;
-
-    font-size: 14px;
-}
-
-
-/* ==================================================
-   RESULT SUCCESS
-================================================== */
-
-.result-success {
-    margin-top: 18px;
-
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-
-    padding: 8px 13px;
-
-    border-radius: 20px;
-
-    background: #dcfce7;
-
-    color: #15803d;
-
-    font-size: 13px;
-
-    font-weight: 600;
-}
-
-
-.success-check {
-    width: 18px;
-    height: 18px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    background: #16a34a;
-
-    color: white;
-
-    font-size: 11px;
-}
-
-
-/* ==================================================
-   INTERPRETATION CARD
-================================================== */
-
-.interpretation-card {
-    margin-top: 20px;
-
-    background: linear-gradient(
-        145deg,
-        #eff6ff,
-        #ffffff
-    );
-
-    border: 1px solid #dbeafe;
-
-    border-radius: 16px;
-
-    padding: 25px;
-
-    box-shadow:
-        0 8px 30px rgba(37, 99, 235, 0.06);
-}
-
-
-/* Header */
-
-.interpretation-header {
-    display: flex;
-
-    align-items: center;
-
-    gap: 13px;
-
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-
-.interpretation-icon {
-    width: 42px;
-    height: 42px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 10px;
-
-    background: #dbeafe;
-
-    color: #2563eb;
-
-    font-size: 17px;
-
-    font-weight: 800;
-}
-
-
-.interpretation-header h3 {
-    margin: 0;
-
-    font-size: 19px;
-
-    color: #172033;
-}
-
-
-.interpretation-header p {
-    margin: 4px 0 0;
-
-    color: #64748b;
-
-    font-size: 12px;
-}
-
-
-/* Table */
-
-.interpretation-table {
-    overflow: hidden;
-
-    border: 1px solid #dbe3ee;
-
-    border-radius: 10px;
-
-    background: white;
-}
-
-
-.interpretation-row {
-    display: grid;
-
-    grid-template-columns: 125px 1fr;
-
-    min-height: 48px;
-
-    border-bottom: 1px solid #e5e7eb;
-}
-
-
-.interpretation-row:last-child {
-    border-bottom: none;
-}
-
-
-.interpretation-range {
-    display: flex;
-
-    align-items: center;
-
-    padding: 10px 15px;
-
-    background: #f8fafc;
-
-    border-right: 1px solid #e5e7eb;
-
-    font-size: 14px;
-
-    font-weight: 700;
-
-    color: #334155;
-}
-
-
-.interpretation-text {
-    display: flex;
-
-    align-items: center;
-
-    padding: 10px 15px;
-
-    font-size: 14px;
-
-    color: #64748b;
-}
-
-
-/* Disclaimer */
-
-.interpretation-note {
-    margin-top: 15px;
-
-    padding: 12px 14px;
-
-    border-radius: 9px;
-
-    background: rgba(255, 255, 255, 0.8);
-
-    border: 1px solid #e2e8f0;
-
-    color: #64748b;
-
-    font-size: 11px;
-
-    line-height: 1.6;
-}
-
-
-/* Mobile */
-
-@media (max-width: 500px) {
-
-    .interpretation-card {
-        padding: 18px;
-    }
-
-    .interpretation-row {
-        grid-template-columns: 95px 1fr;
-    }
-
-    .interpretation-range,
-    .interpretation-text {
-        font-size: 12px;
-        padding: 9px 10px;
-    }
-
-}
-
-
-
-/* ==================================================
-   FOOTER
-================================================== */
-
-.calculator-footer {
-    text-align: center;
-
-    margin-top: 35px;
-
-    color: #94a3b8;
-
-    font-size: 12px;
-}
-
-
-/* ==================================================
-   RESPONSIVE
-================================================== */
-
-@media (max-width: 800px) {
-
-    .calculator-navbar {
-        padding: 0 4%;
-    }
-
-    .doctor-name {
-        display: none;
-    }
-
-    .calculator-wrapper {
-        width: 92%;
-
-        margin-top: 30px;
-    }
-
-    .calculator-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .patient-details {
-        grid-template-columns: 1fr;
-    }
-
-    .page-header h1 {
-        font-size: 27px;
-    }
-}
-
-
-@media (max-width: 500px) {
-
-    .calculator-navbar {
-        height: 64px;
-    }
-
-    .brand {
-        font-size: 17px;
-    }
-
-    .brand-icon {
-        width: 34px;
-        height: 34px;
-    }
-
-    .logout-btn {
-        padding: 8px 11px;
-    }
-
-    .calculator-card,
-    .result-card,
-    .patient-card {
-        padding: 20px;
-    }
-
-    .result-number {
-        font-size: 44px;
-    }
-}
-
-    </style>
 
 </head>
 
 
-<body>
+<body class="hu-body">
+
+<div class="hu-page">
 
 
-<!-- ==================================================
-     NAVBAR
-================================================== -->
+    <!-- Logged-in doctor + logout -->
 
-<nav class="calculator-navbar">
+    <div class="hu-topbar">
 
-    <div class="brand">
+        <span class="hu-user">
 
-        <div class="brand-icon">
-            H
-        </div>
-
-        HOMA-IR
-
-    </div>
-
-
-    <div class="nav-right">
-
-        <span class="doctor-name">
+            <span class="hu-user__avatar">
+                <?php
+                echo htmlspecialchars(
+                    strtoupper(substr($_SESSION["doctor_name"], 0, 1))
+                );
+                ?>
+            </span>
 
             <?php
             echo htmlspecialchars(
@@ -1129,171 +227,138 @@ body {
 
         </span>
 
-
         <a
             href="../logout.php"
-            class="logout-btn"
+            class="hu-logout"
         >
             Logout
         </a>
 
     </div>
 
-</nav>
+
+    <?php hu_page_header(2); ?>
 
 
-<!-- ==================================================
-     MAIN
-================================================== -->
-
-<main class="calculator-wrapper">
+    <main class="hu-main">
 
 
-    <div class="page-header">
+        <?php if ($error !== ""): ?>
 
-        <h1>
-            HOMA-IR Calculator
-        </h1>
+            <div class="hu-alert" role="alert">
 
-        <p>
-            Calculate and save the patient's HOMA-IR result.
-        </p>
+                <?php echo hu_icon("alert"); ?>
 
-    </div>
-
-
-    <?php if ($error !== ""): ?>
-
-        <div class="calculator-error">
-
-            <?php
-            echo htmlspecialchars($error);
-            ?>
-
-        </div>
-
-    <?php endif; ?>
-
-
-    <?php if ($patient !== null): ?>
-
-
-        <!-- PATIENT -->
-
-        <section class="patient-card">
-
-            <div class="patient-header">
-
-                <div class="patient-avatar">
-
+                <span>
                     <?php
-                    echo strtoupper(
-                        substr($patient["name"], 0, 1)
-                    );
+                    echo htmlspecialchars($error);
                     ?>
-
-                </div>
-
-
-                <div>
-
-                    <h2>
-                        <?php
-                        echo htmlspecialchars(
-                            $patient["name"]
-                        );
-                        ?>
-                    </h2>
-
-                    <span>
-                        Patient Information
-                    </span>
-
-                </div>
+                </span>
 
             </div>
 
+        <?php endif; ?>
 
-            <div class="patient-details">
+
+        <?php if ($patient !== null): ?>
 
 
-                <div class="patient-detail">
+            <!-- PATIENT -->
 
-                    <span class="patient-detail-label">
-                        Age
-                    </span>
+            <section class="hu-patient">
 
-                    <span class="patient-detail-value">
+                <div class="hu-patient__who">
+
+                    <div class="hu-patient__avatar">
+                        <?php
+                        echo htmlspecialchars(
+                            strtoupper(substr($patient["name"], 0, 1))
+                        );
+                        ?>
+                    </div>
+
+                    <div>
+
+                        <h2 class="hu-patient__name">
+                            <?php
+                            echo htmlspecialchars(
+                                $patient["name"]
+                            );
+                            ?>
+                        </h2>
+
+                        <span class="hu-patient__role">
+                            Patient Information
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hu-patient__item">
+                    Age
+                    <b>
                         <?php
                         echo htmlspecialchars(
                             $patient["age"]
                         );
                         ?> years
-                    </span>
-
+                    </b>
                 </div>
 
 
-                <div class="patient-detail">
-
-                    <span class="patient-detail-label">
-                        Contact
-                    </span>
-
-                    <span class="patient-detail-value">
+                <div class="hu-patient__item">
+                    Contact
+                    <b>
                         <?php
                         echo htmlspecialchars(
                             $patient["contact"]
                         );
                         ?>
-                    </span>
-
+                    </b>
                 </div>
 
 
-                <div class="patient-detail">
-
-                    <span class="patient-detail-label">
-                        City
-                    </span>
-
-                    <span class="patient-detail-value">
+                <div class="hu-patient__item">
+                    City
+                    <b>
                         <?php
                         echo htmlspecialchars(
                             $patient["city"]
                         );
                         ?>
-                    </span>
-
+                    </b>
                 </div>
 
-
-            </div>
-
-        </section>
+            </section>
 
 
+            <!-- CALCULATOR -->
 
-        <!-- CALCULATOR -->
-
-        <div class="calculator-grid">
-
-
-            <!-- FORM -->
-
-            <section class="calculator-card">
+            <section class="hu-card hu-card--calc">
 
 
-                <div class="calculator-card-header">
+                <div class="hu-card__head">
 
-                    <h2>
-                        Enter Lab Values
-                    </h2>
+                    <div class="hu-card__badge hu-card__badge--solid">
+                        <?php echo hu_icon("calc-solid"); ?>
+                    </div>
 
-                    <p>
-                        Enter the patient's fasting glucose
-                        and fasting insulin values.
-                    </p>
+                    <div>
+
+                        <h2 class="hu-card__title">
+                            HOMA-IR Calculator
+                        </h2>
+
+                        <p class="hu-card__sub">
+                            Enter your fasting insulin and glucose values
+                            to calculate your HOMA-IR score.
+                        </p>
+
+                    </div>
+
+                    <?php echo hu_illustration(); ?>
 
                 </div>
 
@@ -1301,274 +366,379 @@ body {
                 <form method="POST">
 
 
-                    <!-- Glucose Unit -->
+                    <!-- Glucose unit -->
 
-                    <div class="form-group">
+                    <div
+                        class="hu-tabs"
+                        role="radiogroup"
+                        aria-label="Glucose unit"
+                    >
 
-                        <label for="glucose_unit">
-                            Glucose Unit
-                        </label>
+                        <label class="hu-tab">
 
-                        <select
-                            name="glucose_unit"
-                            id="glucose_unit"
-                            class="form-select"
-                            required
-                        >
-
-                            <option value="">
-                                Select unit
-                            </option>
-
-                            <option
+                            <input
+                                type="radio"
+                                name="glucose_unit"
                                 value="mg_dl"
-                                <?php
-                                echo (
-                                    ($_POST["glucose_unit"] ?? "")
-                                    === "mg_dl"
-                                )
-                                ? "selected"
-                                : "";
-                                ?>
+                                <?php echo $selected_unit === "mg_dl" ? "checked" : ""; ?>
+                                required
                             >
-                                mg/dL
-                            </option>
 
-                            <option
+                            <span>Glucose in mg/dL (US Units)</span>
+
+                        </label>
+
+                        <label class="hu-tab">
+
+                            <input
+                                type="radio"
+                                name="glucose_unit"
                                 value="mmol_l"
-                                <?php
-                                echo (
-                                    ($_POST["glucose_unit"] ?? "")
-                                    === "mmol_l"
-                                )
-                                ? "selected"
-                                : "";
-                                ?>
+                                <?php echo $selected_unit === "mmol_l" ? "checked" : ""; ?>
+                                required
                             >
-                                mmol/L
-                            </option>
 
-                        </select>
+                            <span>Glucose in mmol/L (International)</span>
+
+                        </label>
 
                     </div>
 
 
-                    <!-- Fasting Glucose -->
+                    <div class="hu-inputs">
 
-                    <div class="form-group">
 
-                        <label for="fasting_glucose">
-                            Fasting Glucose
-                        </label>
+                        <!-- Fasting Insulin -->
 
-                        <div class="input-wrapper">
+                        <div class="hu-metric">
 
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                name="fasting_glucose"
-                                id="fasting_glucose"
-                                placeholder="Enter fasting glucose"
-                                value="<?php
-                                echo htmlspecialchars(
-                                    $_POST["fasting_glucose"] ?? ""
-                                );
-                                ?>"
-                                required
+                            <div class="hu-metric__head">
+
+                                <?php echo hu_icon("tube", "hu-metric__icon"); ?>
+
+                                <div>
+
+                                    <label
+                                        class="hu-metric__name"
+                                        for="fasting_insulin"
+                                    >
+                                        Fasting Insulin
+                                    </label>
+
+                                    <span class="hu-metric__unit">
+                                        (µIU/mL)
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="hu-spin">
+
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    name="fasting_insulin"
+                                    id="fasting_insulin"
+                                    placeholder="Enter value"
+                                    inputmode="decimal"
+                                    data-step="1"
+                                    value="<?php
+                                    echo htmlspecialchars(
+                                        $_POST["fasting_insulin"] ?? ""
+                                    );
+                                    ?>"
+                                    required
+                                >
+
+                                <span class="hu-spin__btns">
+
+                                    <button
+                                        type="button"
+                                        data-dir="1"
+                                        aria-label="Increase fasting insulin"
+                                    >
+                                        <?php echo hu_icon("chevron-up"); ?>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-dir="-1"
+                                        aria-label="Decrease fasting insulin"
+                                    >
+                                        <?php echo hu_icon("chevron-down"); ?>
+                                    </button>
+
+                                </span>
+
+                            </div>
+
+                            <p class="hu-metric__hint">
+                                e.g. 5
+                            </p>
+
+                        </div>
+
+
+                        <span class="hu-times" aria-hidden="true">&times;</span>
+
+
+                        <!-- Fasting Glucose -->
+
+                        <div class="hu-metric">
+
+                            <div class="hu-metric__head">
+
+                                <?php echo hu_icon("drop", "hu-metric__icon"); ?>
+
+                                <div>
+
+                                    <label
+                                        class="hu-metric__name"
+                                        for="fasting_glucose"
+                                    >
+                                        Fasting Glucose
+                                    </label>
+
+                                    <span
+                                        class="hu-metric__unit"
+                                        id="glucose-unit-label"
+                                    >
+                                        (mg/dL)
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="hu-spin">
+
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    name="fasting_glucose"
+                                    id="fasting_glucose"
+                                    placeholder="Enter value"
+                                    inputmode="decimal"
+                                    data-step="1"
+                                    value="<?php
+                                    echo htmlspecialchars(
+                                        $_POST["fasting_glucose"] ?? ""
+                                    );
+                                    ?>"
+                                    required
+                                >
+
+                                <span class="hu-spin__btns">
+
+                                    <button
+                                        type="button"
+                                        data-dir="1"
+                                        aria-label="Increase fasting glucose"
+                                    >
+                                        <?php echo hu_icon("chevron-up"); ?>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-dir="-1"
+                                        aria-label="Decrease fasting glucose"
+                                    >
+                                        <?php echo hu_icon("chevron-down"); ?>
+                                    </button>
+
+                                </span>
+
+                            </div>
+
+                            <p
+                                class="hu-metric__hint"
+                                id="glucose-hint"
                             >
+                                e.g. 100
+                            </p>
 
                         </div>
 
-                        <div class="unit-help">
-                            Enter the value according to the selected unit.
-                        </div>
-
-                    </div>
-
-
-                    <!-- Fasting Insulin -->
-
-                    <div class="form-group">
-
-                        <label for="fasting_insulin">
-                            Fasting Insulin
-                        </label>
-
-                        <div class="input-wrapper">
-
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                name="fasting_insulin"
-                                id="fasting_insulin"
-                                placeholder="Enter fasting insulin"
-                                value="<?php
-                                echo htmlspecialchars(
-                                    $_POST["fasting_insulin"] ?? ""
-                                );
-                                ?>"
-                                required
-                            >
-
-                        </div>
-
-                        <div class="unit-help">
-                            Enter fasting insulin in µIU/mL.
-                        </div>
 
                     </div>
 
 
                     <button
                         type="submit"
-                        class="calculate-btn"
+                        class="hu-btn hu-btn--calc"
                     >
+                        <?php echo hu_icon("calc"); ?>
                         Calculate HOMA-IR
                     </button>
 
 
                 </form>
 
+
+                <!-- RESULT -->
+
+                <?php if ($result !== null): ?>
+
+                    <div class="hu-result" id="result">
+
+                        <h3 class="hu-result__title">
+                            Your HOMA-IR Result
+                        </h3>
+
+                        <div class="hu-result__value">
+                            <?php echo htmlspecialchars($result); ?>
+                        </div>
+
+                        <div class="hu-result__ok">
+
+                            <?php echo hu_icon("check-circle"); ?>
+
+                            Result calculated successfully
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="hu-meaning">
+
+                        <div class="hu-meaning__head">
+
+                            <?php echo hu_icon("bars"); ?>
+
+                            <h3>What does this mean?</h3>
+
+                        </div>
+
+                        <table class="hu-table">
+
+                            <tr>
+                                <th scope="row">&lt; 1.0</th>
+                                <td>Insulin-sensitive (Optimal)</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">1.0 – 1.9</th>
+                                <td>May indicate early insulin resistance</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">2.0 – 2.8</th>
+                                <td>Intermediate range</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">&ge; 2.9</th>
+                                <td>May indicate significant insulin resistance</td>
+                            </tr>
+
+                        </table>
+
+                    </div>
+
+
+                    <p class="hu-footnote">
+
+                        <?php echo hu_icon("info"); ?>
+
+                        <span>
+                            <b>Note:</b> Reference ranges may vary by population
+                            and laboratory. Please consult your healthcare
+                            provider for proper interpretation.
+                        </span>
+
+                    </p>
+
+                <?php endif; ?>
+
+
             </section>
 
 
-
-            <!-- RESULT -->
-
-            <?php if ($result !== null): ?>
-
-    <section class="result-card">
-
-        <div class="result-icon">
-            ✓
-        </div>
-
-        <h3>
-            Your HOMA-IR Result
-        </h3>
-
-        <div class="result-number">
-            <?php echo htmlspecialchars($result); ?>
-        </div>
-
-        <div class="result-unit">
-            HOMA-IR
-        </div>
+        <?php endif; ?>
 
 
-        <!--- -------------- -->
-        <div class="interpretation-header">
+    </main>
 
-            <div class="interpretation-icon">
-                ▂▅▇
-            </div>
-
-            <div>
-
-                <h3>
-                    What does this mean?
-                </h3>
-
-                
-
-            </div>
-
-        </div>
+</div>
 
 
-        <div class="interpretation-table">
+<script>
+(function () {
 
-            <div class="interpretation-row">
+    // Glucose unit tabs -> update the unit label + example under the glucose box
+    var units = {
+        mg_dl:  { label: "(mg/dL)",  hint: "e.g. 100", step: "1"   },
+        mmol_l: { label: "(mmol/L)", hint: "e.g. 5.5", step: "0.1" }
+    };
 
-                <div class="interpretation-range">
-                    &lt; 1.0
-                </div>
+    var radios       = document.querySelectorAll('input[name="glucose_unit"]');
+    var unitLabel    = document.getElementById("glucose-unit-label");
+    var hint         = document.getElementById("glucose-hint");
+    var glucoseInput = document.getElementById("fasting_glucose");
 
-                <div class="interpretation-text">
-                    Insulin-sensitive range
-                </div>
+    function syncUnit() {
 
-            </div>
+        var chosen = document.querySelector('input[name="glucose_unit"]:checked');
+        var unit   = units[chosen ? chosen.value : "mg_dl"];
 
+        unitLabel.textContent = unit.label;
+        hint.textContent      = unit.hint;
 
-            <div class="interpretation-row">
+        glucoseInput.setAttribute("data-step", unit.step);
+    }
 
-                <div class="interpretation-range">
-                    1.0 – 1.9
-                </div>
+    radios.forEach(function (radio) {
+        radio.addEventListener("change", syncUnit);
+    });
 
-                <div class="interpretation-text">
-                    May indicate early insulin resistance
-                </div>
-
-            </div>
-
-
-            <div class="interpretation-row">
-
-                <div class="interpretation-range">
-                    2.0 – 2.8
-                </div>
-
-                <div class="interpretation-text">
-                    Intermediate range
-                </div>
-
-            </div>
+    syncUnit();
 
 
-            <div class="interpretation-row">
+    // Up / down buttons inside the number boxes
+    document.querySelectorAll(".hu-spin").forEach(function (box) {
 
-                <div class="interpretation-range">
-                    ≥ 2.9
-                </div>
+        var input = box.querySelector("input");
 
-                <div class="interpretation-text">
-                    May indicate significant insulin resistance
-                </div>
+        box.querySelectorAll("button[data-dir]").forEach(function (button) {
 
-            </div>
+            button.addEventListener("click", function () {
 
-        </div>
+                var direction = parseInt(button.getAttribute("data-dir"), 10);
+                var step      = parseFloat(input.getAttribute("data-step")) || 1;
+                var current   = parseFloat(input.value);
 
+                if (isNaN(current)) {
+                    current = 0;
+                }
 
-        <div class="interpretation-note">
+                var next = Math.max(0, Math.round((current + direction * step) * 100) / 100);
 
-            These ranges are provided for reference only.
-            HOMA-IR should be interpreted together with
-            other clinical information by a qualified healthcare professional.
-
-        </div>
-        <!--- -------------- -->
-
-
-        <div class="result-success">
-
-            <span class="success-check">✓</span>
-
-            Result calculated successfully
-        </div>
-
-    </section>
-
-   
-
-        
-
-            <?php endif; ?>
+                input.value = next;
+                input.focus();
+            });
+        });
+    });
 
 
-        </div>
+    // After calculating, bring the result into view
+    var result = document.getElementById("result");
 
+    if (result) {
 
-    <?php endif; ?>
+        var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+        result.scrollIntoView({
+            behavior: calm ? "auto" : "smooth",
+            block: "center"
+        });
+    }
 
-
-</main>
-
+})();
+</script>
 
 </body>
 
